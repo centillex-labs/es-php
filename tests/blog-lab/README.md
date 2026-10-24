@@ -52,6 +52,7 @@ Or run the whole A/B in one shot (starts one container at a time):
 export BLOG_PASSWORD=labpassword
 bash run.sh          # session-injection A/B
 bash run.sh --oom    # + CVE-2026-109618 OOM A/B
+bash modphp_ab.sh    # + OOM A/B on Apache mod_php (the advisory's target SAPI)
 ```
 
 `BLOG_MEMORY_LIMIT` (default `24M`) and `BLOG_POST_MAX_SIZE` (default `2M`) are
@@ -72,6 +73,7 @@ Headline:
 | 619 `\|` delimiter | pipe kept | **pipe encoded (`%7C`)** |
 | 618 chunked OOM | process alive but **wedged**, port held | **exits 1** (fail-stop) |
 | 618 CLI OOM probes | exit 255 | exit 1 |
+| 618 mod_php OOM | **HTTP 500** (shutdown ran on OOM path) | **connection dropped** (worker exits first) |
 
 ## What it actually tests
 
@@ -111,8 +113,10 @@ between patched and unpatched PHP rather than always reporting success.
 - Not covered: sanitizers, ZTS, mod_php, OPcache runtime, 32-bit, and the
   php2shell Chain B/C/D parity gaps.
 
-## Baseline image
+## Baseline images
 
-`containers/php-5/Dockerfile.baseline` builds **unpatched upstream 5.4.45** for
-differential testing. It is deliberately vulnerable and must never be used for
-anything else.
+- `containers/php-5/Dockerfile.baseline` — unpatched upstream 5.4.45, CLI/FPM.
+- `containers/php-5/Dockerfile.modphp` — PHP 5.4 as an Apache module; pass
+  `--build-arg SKIP_PATCHES=1` for the unpatched variant.
+
+Both are deliberately vulnerable and must never be used for anything else.

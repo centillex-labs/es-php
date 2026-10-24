@@ -1,0 +1,64 @@
+# Apache mod_php build for the CVE-2026-109618 lab.
+#
+# The 618 RCE conversion depends on mod_php's request shutdown running on
+# invalid memory after an OOM, so the CVE's real target SAPI is mod_php, not
+# the CLI server or FPM. This image exists so the OOM trigger can be fired at
+# the SAPI the advisory actually describes.
+#
+# Development/test image only. Never expose it.
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential autoconf bison re2c pkg-config ca-certificates gzip patch \
+    apache2 apache2-dev libxml2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG BRANCH
+ARG VERSION
+ARG SHA256
+WORKDIR /usr/src/php
+COPY downloads/php-${VERSION}.tar.gz /tmp/php.tar.gz
+RUN echo "${SHA256}  /tmp/php.tar.gz" | sha256sum -c - \
+    && tar -xzf /tmp/php.tar.gz --strip-components=1 && rm /tmp/php.tar.gz
+
+COPY php-${BRANCH}-patches/series /patches/series
+COPY php-${BRANCH}-patches/CVE-2026-109619/002-restore-upload-progress.patch /patches/CVE-2026-109619/002-restore-upload-progress.patch
+COPY php-${BRANCH}-patches/CVE-2026-109619/003-harden-progress-record.patch /patches/CVE-2026-109619/003-harden-progress-record.patch
+COPY php-${BRANCH}-patches/CVE-2026-109618/001-avoid-state-corruption.patch /patches/CVE-2026-109618/001-avoid-state-corruption.patch
+# SKIP_PATCHES=1 builds the deliberately vulnerable baseline for A/B testing.
+ARG SKIP_PATCHES=0
+RUN set -eu; \
+    if [ "$SKIP_PATCHES" = "1" ]; then echo 'baseline: patch series skipped'; exit 0; fi; \
+    while IFS= read -r patchfile; do \
+      case "$patchfile" in ''|'#'*) continue ;; esac; \
+      patch --batch --fuzz=0 -p1 < "/patches/$patchfile"; \
+    done < /patches/series
+
+ARG JOBS=3
+# mod_php requires the prefork MPM; Debian defaults to event.
+RUN CFLAGS='-O2 -g -fcommon' ./configure --disable-all \
+      --with-apxs2=/usr/bin/apxs2 --enable-session --enable-json \
+    && make -j"$JOBS"
+
+RUN set -eu; \
+    a2dismod mpm_event mpm_worker || true; \
+    a2enmod mpm_prefork; \
+    printf 'LoadModule php5_module /usr/src/php/libs/libphp5.so\nAddType application/x-httpd-php .php\n' \
+      > /etc/apache2/conf-available/php5.conf; \
+    a2enconf php5; \
+    printf 'Listen 8080\nServerName localhost\nDocumentRoot /web\n<Directory /web>\n  Require all granted\n</Directory>\n' \
+      > /etc/apache2/conf-available/lab.conf; \
+    a2enconf lab; \
+    rm -f /etc/apache2/sites-enabled/*
+
+ENV APACHE_RUN_USER=www-data \
+    APACHE_RUN_GROUP=www-data \
+    APACHE_LOG_DIR=/var/log/apache2 \
+    APACHE_PID_FILE=/var/run/apache2/apache2.pid \
+    APACHE_RUN_DIR=/var/run/apache2 \
+    APACHE_LOCK_DIR=/var/lock/apache2 \
+    PHP_MEMORY_LIMIT=32M \
+    PHP_POST_MAX_SIZE=8M
+
+# php.ini is written at start-up so the limits stay tunable per run.
+# PHP 5.4 reads /usr/local/lib/php.ini (PREFIX/lib), not PREFIX/etc.
+CMD ["/bin/sh", "-ec", "mkdir -p /var/run/apache2 /var/lock/apache2; { echo 'error_reporting = E_ALL'; echo 'display_errors = Off'; echo 'log_errors = On'; echo \"memory_limit = ${PHP_MEMORY_LIMIT}\"; echo 'session.save_path = /data/sessions'; echo 'session.upload_progress.enabled = 1'; echo 'session.upload_progress.cleanup = 0'; echo 'session.upload_progress.min_freq = 0'; echo 'upload_max_filesize = 1M'; echo \"post_max_size = ${PHP_POST_MAX_SIZE}\"; } > /usr/local/lib/php.ini; exec apachectl -DFOREGROUND"]

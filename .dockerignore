@@ -3,6 +3,7 @@
 !containers/php-5/
 !containers/php-5/Dockerfile
 !containers/php-5/Dockerfile.baseline
+!containers/php-5/Dockerfile.modphp
 !downloads/php-5.4.45.tar.gz
 !downloads/php-5.5.38.tar.gz
 !downloads/php-5.6.40.tar.gz
