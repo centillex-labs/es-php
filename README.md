@@ -96,6 +96,9 @@ bash tests/blog-lab/run.sh --oom    # + OOM A/B (CVE-2026-109618)
 Chain B and Chain C harnesses: `bash tests/chain-b-uaf/run.sh`,
 `bash tests/chain-c-userini/run.sh`.
 
+Encoding scope (what patch 003 changes, and what it must not):
+`bash tests/progress-encoding-scope/run.sh`.
+
 The unpatched baseline for differential testing comes from
 `containers/php-5/Dockerfile.baseline` (deliberately vulnerable; local use
 only). Results, including what they do **not** establish, are recorded in
