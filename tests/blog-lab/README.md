@@ -50,8 +50,26 @@ Or run the whole A/B in one shot (starts one container at a time):
 
 ```sh
 export BLOG_PASSWORD=labpassword
-bash run.sh
+bash run.sh          # session-injection A/B
+bash run.sh --oom    # + CVE-2026-109618 OOM A/B
 ```
+
+`BLOG_MEMORY_LIMIT` (default `24M`) and `BLOG_POST_MAX_SIZE` (default `2M`) are
+tunable; the OOM case lowers the limit to `8M` so a modest body exhausts it.
+
+## CVE test results
+
+Measured outcomes against the patched build vs the unpatched baseline are in
+[`security/blog-lab-cve-results.md`](../../security/blog-lab-cve-results.md).
+Headline:
+
+| Test | Baseline | Patched |
+|---|---|---|
+| 619 filename `<?php …` | stored **raw** | stored as `%3C?php …` |
+| 619 benign `normal.txt` | unchanged | **unchanged** |
+| 619 filename `x\|O:8:…` | pipe kept | **pipe kept (gap)** |
+| 618 chunked OOM | process alive but **wedged**, port held | **exits 1** (fail-stop) |
+| 618 CLI OOM probes | exit 255 | exit 1 |
 
 ## What it actually tests
 
@@ -75,11 +93,16 @@ between patched and unpatched PHP rather than always reporting success.
 
 - A passing run proves **only** that this one injection vector is closed. It is
   **not** a CVE verification and not a clean bill of health for PHP 5.4.
+- No mod_php build exists here, so the 618 RCE conversion (which needs mod_php
+  request shutdown on invalid state) was **not** attempted. Only the
+  state/termination difference is observable.
 - The application layer is intentionally safe; do not use the blog to conclude
   anything about real-world application security.
 - The built-in CLI server is a single process. Tests that depend on **FPM worker
   reuse, recycling or post-OOM recovery** cannot be done here — use
   `scripts/test-php7-fpm.py` and `tests/php2shell-poc/replay.py` for those.
+- Chain C (handler mismatch) is not runnable without per-directory `.user.ini`
+  support, and the `|` primitive it needs is still present in session files.
 - `--disable-all` builds omit `ext/hash` and `ext/ctype`. Fixtures must not use
   `hash()`, `hash_equals()` or `ctype_*`.
 - Not covered: sanitizers, ZTS, mod_php, OPcache runtime, 32-bit, and the

@@ -87,13 +87,14 @@ application (~2.3 MiB RSS, no database, loopback-only, tmpfs storage):
 
 ```sh
 export BLOG_PASSWORD=labpassword
-bash tests/blog-lab/run.sh     # patched LTS vs unpatched baseline
+bash tests/blog-lab/run.sh          # smoke A/B (safe)
+bash tests/blog-lab/run.sh --oom    # + OOM A/B (CVE-2026-109618)
 ```
 
 The unpatched baseline for differential testing comes from
 `containers/php-5/Dockerfile.baseline` (deliberately vulnerable; local use
-only). See [tests/blog-lab/README.md](tests/blog-lab/README.md) for what a
-passing run does and does not prove.
+only). Results, including what they do **not** establish, are recorded in
+[security/blog-lab-cve-results.md](security/blog-lab-cve-results.md).
 
 Direct HTTP tests expose randomly allocated **127.0.0.1-only** ports, with no
 WAF. CLI/PHPT tests use network-disabled containers. These are development

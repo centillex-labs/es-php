@@ -46,5 +46,37 @@ run_case() {
 status=0
 run_case "patched LTS"        "$PATCHED_IMAGE"  0 || status=1
 run_case "unpatched baseline" "$BASELINE_IMAGE" 2 || status=1
+
+if [ "${1:-}" = "--oom" ]; then
+  echo
+  echo "=== OOM A/B (CVE-2026-109618): chunked multipart past memory_limit"
+  run_oom() {
+    local label="$1" image="$2"
+    docker rm -f blog-oom >/dev/null 2>&1
+    docker run -d --name blog-oom --user 65534:65534 -w /usr/src/php \
+      -e BLOG_PASSWORD=x -e BLOG_LAB_ENABLED=1 \
+      -e BLOG_MEMORY_LIMIT=8M -e BLOG_POST_MAX_SIZE=64M \
+      -v "$PWD/web:/web:ro" \
+      --tmpfs /data:rw,noexec,nosuid,size=16m,mode=1777 \
+      --tmpfs /tmp:rw,noexec,nosuid,size=8m \
+      --read-only --cap-drop ALL --security-opt no-new-privileges \
+      --memory 96m --cpus 0.5 --pids-limit 32 \
+      -p "127.0.0.1:${BLOG_PORT}:8080" "$image" \
+      /bin/sh -ec 'mkdir -p /data/sessions /data/uploads; exec sapi/cli/php -n -d memory_limit=$BLOG_MEMORY_LIMIT -d session.save_path=/data/sessions -d session.upload_progress.enabled=1 -d session.upload_progress.cleanup=0 -d session.upload_progress.min_freq=0 -d upload_max_filesize=1M -d post_max_size=$BLOG_POST_MAX_SIZE -d display_errors=0 -d log_errors=1 -S 0.0.0.0:8080 -t /web' >/dev/null
+    for _ in $(seq 1 40); do
+      curl -fsS --max-time 2 "http://127.0.0.1:${BLOG_PORT}/?action=health" >/dev/null 2>&1 && break
+      sleep 0.25
+    done
+    echo "--- $label ($image)"
+    python3 oom_probe.py --url "http://127.0.0.1:${BLOG_PORT}" | sed 's/^/    /'
+    echo "    container: $(docker inspect -f 'status={{.State.Status}} exit={{.State.ExitCode}}' blog-oom)"
+    docker rm -f blog-oom >/dev/null 2>&1
+  }
+  run_oom "patched LTS"        "$PATCHED_IMAGE"
+  run_oom "unpatched baseline" "$BASELINE_IMAGE"
+  echo
+  echo "expected: baseline wedges (status=running, not serving); patched exits 1"
+fi
+
 if [ "$status" -eq 0 ]; then echo "A/B OK"; else echo "A/B FAILED" >&2; fi
 exit "$status"

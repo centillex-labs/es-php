@@ -7,18 +7,20 @@ services:
     command:
       - >-
         mkdir -p /data/sessions /data/uploads;
-        exec sapi/cli/php -n -d memory_limit=24M
+        exec sapi/cli/php -n -d memory_limit=$$BLOG_MEMORY_LIMIT
         -d session.save_path=/data/sessions
         -d session.upload_progress.enabled=1
         -d session.upload_progress.cleanup=0
         -d session.upload_progress.min_freq=0
         -d session.upload_progress.freq=0
-        -d upload_max_filesize=1M -d post_max_size=2M
+        -d upload_max_filesize=1M -d post_max_size=$$BLOG_POST_MAX_SIZE
         -d display_errors=0 -d log_errors=1
         -S 0.0.0.0:8080 -t /web
     environment:
       BLOG_PASSWORD: ${BLOG_PASSWORD:?Set BLOG_PASSWORD to a disposable lab password}
       BLOG_LAB_ENABLED: ${BLOG_LAB_ENABLED:-0}
+      BLOG_MEMORY_LIMIT: ${BLOG_MEMORY_LIMIT:-24M}
+      BLOG_POST_MAX_SIZE: ${BLOG_POST_MAX_SIZE:-2M}
     ports:
       - "127.0.0.1:${BLOG_PORT:-8054}:8080"
     volumes:
