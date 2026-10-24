@@ -55,9 +55,10 @@ Recorded honestly rather than implied as covered:
 
 - Full engine test suites, sanitizers/Valgrind, ZTS, mod_php, OPcache runtime
   and 32-bit builds are **not** covered by the current test matrix.
-- php2shell Chain B (symbol-resolution dependent) is inconclusive; Chain C is
-  not runnable on the CLI server. See
-  [`security/php2shell-poc-replay.md`](security/php2shell-poc-replay.md).
+- php2shell Chain B is **not applicable to 5.4** (Valgrind: no UAF, with an
+  8.1 control proving the trigger works). Chain C **reproduces on unpatched
+  5.4 and is blocked by patch 003**. See
+  [`security/chain-b-c-results.md`](security/chain-b-c-results.md).
 - CVE-2026-115560 candidate patches are **held and excluded** from default
   releases.
 

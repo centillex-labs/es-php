@@ -105,9 +105,9 @@ between patched and unpatched PHP rather than always reporting success.
 - The built-in CLI server is a single process. Tests that depend on **FPM worker
   reuse, recycling or post-OOM recovery** cannot be done here — use
   `scripts/test-php7-fpm.py` and `tests/php2shell-poc/replay.py` for those.
-- Chain C (handler mismatch) is not runnable without per-directory `.user.ini`
-  support; the `|` delimiter it needs is now encoded, so the primitive is gone
-  even though the chain itself remains untested end-to-end.
+- Chains B and C have their own harnesses:
+  `tests/chain-b-uaf/` (Valgrind) and `tests/chain-c-userini/` (php-cgi +
+  `.user.ini`). Results: [`security/chain-b-c-results.md`](../../security/chain-b-c-results.md).
 - `--disable-all` builds omit `ext/hash` and `ext/ctype`. Fixtures must not use
   `hash()`, `hash_equals()` or `ctype_*`.
 - Not covered: sanitizers, ZTS, mod_php, OPcache runtime, 32-bit, and the

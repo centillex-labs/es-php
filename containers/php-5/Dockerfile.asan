@@ -1,0 +1,51 @@
+# AddressSanitizer build of PHP 5.4 for the Chain B (var_destroy reentrancy UAF)
+# harness.
+#
+# Chain B needs a sanitizer: on a normal build the UAF read is silent and the
+# exploit that depends on it fails for unrelated reasons (symbol lookup), which
+# is why it was previously recorded as "inconclusive" rather than pass/fail.
+#
+# USE_ZEND_ALLOC=0 is required at runtime, otherwise Zend's own allocator hides
+# the frees from ASan.
+#
+# Development/test image only.
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential autoconf bison re2c pkg-config ca-certificates gzip patch \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG BRANCH
+ARG VERSION
+ARG SHA256
+WORKDIR /usr/src/php
+COPY downloads/php-${VERSION}.tar.gz /tmp/php.tar.gz
+RUN echo "${SHA256}  /tmp/php.tar.gz" | sha256sum -c - \
+    && tar -xzf /tmp/php.tar.gz --strip-components=1 && rm /tmp/php.tar.gz
+
+COPY php-${BRANCH}-patches/series /patches/series
+COPY php-${BRANCH}-patches/CVE-2026-109619/002-restore-upload-progress.patch /patches/CVE-2026-109619/002-restore-upload-progress.patch
+COPY php-${BRANCH}-patches/CVE-2026-109619/003-harden-progress-record.patch /patches/CVE-2026-109619/003-harden-progress-record.patch
+COPY php-${BRANCH}-patches/CVE-2026-109618/001-avoid-state-corruption.patch /patches/CVE-2026-109618/001-avoid-state-corruption.patch
+
+# SKIP_PATCHES=1 builds the unpatched baseline for A/B comparison.
+ARG SKIP_PATCHES=0
+RUN set -eu; \
+    if [ "$SKIP_PATCHES" = "1" ]; then echo 'baseline: patch series skipped'; exit 0; fi; \
+    while IFS= read -r patchfile; do \
+      case "$patchfile" in ''|'#'*) continue ;; esac; \
+      patch --batch --fuzz=0 -p1 < "/patches/$patchfile"; \
+    done < /patches/series
+
+ARG JOBS=3
+# detect_leaks=0 matters during the build too: configure runs instrumented
+# conftest binaries, and LeakSanitizer's exit-time scan hangs under the build
+# sandbox (observed: a conftest spinning at 100% CPU for minutes).
+ENV ASAN_OPTIONS=detect_leaks=0:abort_on_error=0:halt_on_error=0:symbolize=1
+RUN CFLAGS='-O1 -g -fsanitize=address -fno-omit-frame-pointer -fcommon' \
+    LDFLAGS='-fsanitize=address' \
+    ./configure --disable-all --enable-cli --enable-session --enable-json \
+    && make -j"$JOBS"
+
+ENV USE_ZEND_ALLOC=0
+
+CMD ["sapi/cli/php", "-v"]

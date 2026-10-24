@@ -17,8 +17,9 @@ these narrow changes do not address all their known vulnerabilities.
 
 Current results and policy: [upload-progress compatibility](security/upload-progress-compatibility.md).
 **php2shell PoC replay: Chain A RCE blocked by the progress-record hardening
-(in default series); the handler-mismatch `|` delimiter is encoded too;
-memory-corruption chains did not reproduce.**
+(in default series); Chain C (handler mismatch) reproduces unpatched and is
+blocked by it; Chain B is not applicable to 5.4 (Valgrind, with an 8.1
+control); OOM chains did not reproduce.**
 Details: [replay report](security/php2shell-poc-replay.md).
 The CVE-2026-115560 serializer-policy candidate remains held and excluded from
 default builds.
@@ -91,6 +92,9 @@ export BLOG_PASSWORD=labpassword
 bash tests/blog-lab/run.sh          # smoke A/B (safe)
 bash tests/blog-lab/run.sh --oom    # + OOM A/B (CVE-2026-109618)
 ```
+
+Chain B and Chain C harnesses: `bash tests/chain-b-uaf/run.sh`,
+`bash tests/chain-c-userini/run.sh`.
 
 The unpatched baseline for differential testing comes from
 `containers/php-5/Dockerfile.baseline` (deliberately vulnerable; local use
