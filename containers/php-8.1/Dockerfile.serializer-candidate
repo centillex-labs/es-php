@@ -1,0 +1,11 @@
+# Experimental local policy fix, not a release image.
+FROM es-php:8.1-session-experimental
+COPY php-8.1-patches/CVE-2026-115560/002-experimental-pin-upload-serializer.patch /tmp/serializer.patch
+ARG DEBUG=0
+RUN patch --batch --fuzz=0 -p1 < /tmp/serializer.patch \
+    && if [ "$DEBUG" = 1 ]; then \
+         make clean && ./configure --disable-all --enable-cli --enable-fpm \
+           --enable-session --enable-opcache --enable-zend-test --enable-debug; \
+       fi \
+    && make -j4
+CMD ["sapi/cli/php", "-v"]

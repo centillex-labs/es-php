@@ -1,0 +1,10 @@
+# Requires the baseline image built by scripts/test-php-8.1.
+FROM es-php:8.1-test
+COPY php-8.1-patches/CVE-2026-115560/001-experimental-session-prerequisites.patch /tmp/prerequisites.patch
+# The held prerequisite was authored against the original EOL patch. Undo only
+# the compatibility overlay first; the prerequisite itself restores progress.
+RUN patch --batch --fuzz=0 -R -p1 < /patches/CVE-2026-109619/002-restore-upload-progress.patch \
+    && patch --batch --fuzz=0 -p1 < /tmp/prerequisites.patch \
+    && touch ext/standard/var_unserializer.re \
+    && make -j4
+CMD ["sapi/cli/php", "-v"]

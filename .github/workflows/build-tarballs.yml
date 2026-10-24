@@ -1,0 +1,84 @@
+name: build-tarballs
+
+# Reusable: builds and verifies one release tarball per branch.
+on:
+  workflow_call:
+    inputs:
+      branches:
+        description: JSON array of branches to build
+        type: string
+        required: false
+        default: '["5.4","5.5","5.6","7.0","7.1","7.2","7.3","7.4","8.1"]'
+      revision:
+        description: Override the LTS revision (blank uses sources.lock.json)
+        type: string
+        required: false
+        default: ""
+  workflow_dispatch:
+    inputs:
+      branches:
+        description: JSON array of branches to build
+        type: string
+        required: false
+        default: '["5.4","5.5","5.6","7.0","7.1","7.2","7.3","7.4","8.1"]'
+      revision:
+        description: Override the LTS revision (blank uses sources.lock.json)
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: php ${{ matrix.branch }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ${{ fromJSON(inputs.branches) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential autoconf bison re2c pkg-config file
+
+      - name: Cache upstream tarballs
+        uses: actions/cache@v4
+        with:
+          path: .cache/upstream
+          key: upstream-${{ hashFiles('sources.lock.json') }}
+
+      - name: Build release tarball
+        env:
+          LTS_REVISION: ${{ inputs.revision }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ -n "${LTS_REVISION:-}" ]; then args+=(--revision "$LTS_REVISION"); fi
+          python3 scripts/es-release.py "${{ matrix.branch }}" \
+            --out dist --cache .cache/upstream "${args[@]}"
+
+      # Builds what we ship: compiles the tarball and asserts the version
+      # suffix, PHP_VERSION_ID and the upload-progress policy.
+      - name: Verify release (compile + assertions)
+        run: bash scripts/verify-release-tarball.sh dist/php-*.tar.gz
+
+      - name: Upload tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarballs-${{ matrix.branch }}
+          path: |
+            dist/php-*.tar.gz
+            dist/php-*.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 14

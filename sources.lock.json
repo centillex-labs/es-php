@@ -1,0 +1,245 @@
+{
+  "release_policy": {
+    "scheme": "<upstream-version>-lts<N>",
+    "example": "8.1.34-lts1",
+    "suffix": "-lts",
+    "revision_field": "es_revision",
+    "artifact_naming": "php-<release>.tar.gz",
+    "php_version_id": "left at the upstream release value (integer checks unaffected)",
+    "notes": "Branches are upstream-EOL, so the base version never changes; the trailing integer distinguishes successive releases of the same base. Bump es_revision for a branch whenever its patch series changes."
+  },
+  "branches": {
+    "5.4": {
+      "version": "5.4.45",
+      "version_id": 50445,
+      "es_revision": 1,
+      "url": "https://museum.php.net/php5/php-5.4.45.tar.gz",
+      "sha256": "25bc4723955f4e352935258002af14a14a9810b491a19400d76fcdfa9d04b28f",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=5.4.45",
+      "patches": [
+        {
+          "path": "php-5.4-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "upstream_origin": "712e60f9edfd03f0960fc4fc3c2c375f42b90aa2",
+          "kind": "local-backport",
+          "sha256": "8225c4abdc9093d7466056793ea2db10128026804750847f912ce41eacd6a024"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "ce561320804d02a746284d20d7f9feb2344e2db94ed42e9e6a97f7301cb1b8fc"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "479c812db2591b3bf726052775d47d7209b1ea422ceaae564e4c0fa257924246"
+        }
+      ]
+    },
+    "5.5": {
+      "version": "5.5.38",
+      "version_id": 50538,
+      "es_revision": 1,
+      "url": "https://museum.php.net/php5/php-5.5.38.tar.gz",
+      "sha256": "4f458c9b504269615715a62f182b7c2f89bb8284f484befc221b56a1571b506e",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=5.5.38",
+      "patches": [
+        {
+          "path": "php-5.5-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "upstream_origin": "712e60f9edfd03f0960fc4fc3c2c375f42b90aa2",
+          "kind": "local-backport",
+          "sha256": "bbc2d66f1996c4fc5603683f95b8690cefa3f90cb53856fbed3faed965dd61f9"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "5a81c4aff863e06a8059225098f598ccc4454d689232a98223c13d068f9552b5"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "a7e0ab80c78835c7f42f5cf66881fe81a56cf686cc44597ee6713f3c8b1ea2f9"
+        }
+      ]
+    },
+    "5.6": {
+      "version": "5.6.40",
+      "version_id": 50640,
+      "es_revision": 1,
+      "url": "https://museum.php.net/php5/php-5.6.40.tar.gz",
+      "sha256": "56fb9878d12fdd921f6a0897e919f4e980d930160e154cbde2cc6d9206a27cac",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=5.6.40",
+      "patches": [
+        {
+          "path": "php-5.6-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "upstream_origin": "712e60f9edfd03f0960fc4fc3c2c375f42b90aa2",
+          "kind": "local-backport",
+          "sha256": "7970ca2cd29b168f86d2e00e5ab2e710112a54052b5665595c64dea4c6ae39ef"
+        },
+        {
+          "path": "php-5.6-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "197ded3610aa1b31df6bc41b2a42143d99e4d3754cafb93dbef7c590232691c5"
+        },
+        {
+          "path": "php-5.6-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "9e8c57d7156dba91e8ef9fb2f50eb68a3080859b2844c003975fad6c5ab7b651"
+        }
+      ]
+    },
+    "7.4": {
+      "version": "7.4.33",
+      "version_id": 70433,
+      "es_revision": 1,
+      "url": "https://museum.php.net/php7/php-7.4.33.tar.xz",
+      "sha256": "924846abf93bc613815c55dd3f5809377813ac62a9ec4eb3778675b82a27b927",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=7.4.33",
+      "patches": [
+        {
+          "path": "php-7.4-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "url": "https://github.com/php/php-src/commit/712e60f9edfd03f0960fc4fc3c2c375f42b90aa2.patch",
+          "sha256": "5fe57ca6ee96d59b36c6e0ca842843c50884f177bef1e85234cf669b577f5e48"
+        },
+        {
+          "path": "php-7.4-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "30e061f876acf827490ea107db75fdb8c363c2b430ca60577e9036568105cec2"
+        },
+        {
+          "path": "php-7.4-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "1c289671049fc9dd9d018849864729811c39f22710f650f0954fa913c773a820"
+        }
+      ]
+    },
+    "7.3": {
+      "version": "7.3.33",
+      "version_id": 70333,
+      "es_revision": 1,
+      "url": "https://museum.php.net/php7/php-7.3.33.tar.xz",
+      "sha256": "166eaccde933381da9516a2b70ad0f447d7cec4b603d07b9a916032b215b90cc",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=7.3.33",
+      "patches": [
+        {
+          "path": "php-7.3-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "upstream_origin": "712e60f9edfd03f0960fc4fc3c2c375f42b90aa2",
+          "kind": "local-backport",
+          "sha256": "eba2b6191123488ec18e2d67dcf07d3434605f721a80851acfc45b046f3c6ee0"
+        },
+        {
+          "path": "php-7.3-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "481b4e009508bceafe13e8b31651ee6c009fbd47ea1f506a022244303fdbfb92"
+        },
+        {
+          "path": "php-7.3-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "758c6945668a59e7ae63c1afa8e03ae6a2eb03ade39ee0a8abad08a68a8b2d04"
+        }
+      ]
+    },
+    "7.2": {
+      "version": "7.2.34",
+      "version_id": 70234,
+      "es_revision": 1,
+      "url": "https://museum.php.net/php7/php-7.2.34.tar.xz",
+      "sha256": "409e11bc6a2c18707dfc44bc61c820ddfd81e17481470f3405ee7822d8379903",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=7.2.34",
+      "patches": [
+        {
+          "path": "php-7.2-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "upstream_origin": "712e60f9edfd03f0960fc4fc3c2c375f42b90aa2",
+          "kind": "local-backport",
+          "sha256": "fc8deba8bc6b58a1c340dce44fc81dc378fd410b689832ef7327577c691ec912"
+        },
+        {
+          "path": "php-7.2-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "775577abdf2d297ae7a73bc9f1b007f846efe6b239c88057da202394813cf4fe"
+        },
+        {
+          "path": "php-7.2-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "6c024927bba6185cf534aa6a9b2b4ab3d82203dc8f0cef0fe459d7a6fe74c59e"
+        }
+      ]
+    },
+    "7.1": {
+      "version": "7.1.33",
+      "version_id": 70133,
+      "es_revision": 1,
+      "url": "https://museum.php.net/php7/php-7.1.33.tar.xz",
+      "sha256": "bd7c0a9bd5433289ee01fd440af3715309faf583f75832b64fe169c100d52968",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=7.1.33",
+      "patches": [
+        {
+          "path": "php-7.1-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "upstream_origin": "712e60f9edfd03f0960fc4fc3c2c375f42b90aa2",
+          "kind": "local-backport",
+          "sha256": "75d6069ed6b62d82ea6ca4545ec65e73e615598792f46be5207d92bcc536bc2a"
+        },
+        {
+          "path": "php-7.1-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "650a8adeac1099186ce8d7b4449117633fb3b0d6f39c9aac5c968c706264577a"
+        },
+        {
+          "path": "php-7.1-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "9ff2cfcce0f00e4e45c15ea515a8dca857b55c2fb91e45cddb4a5a035f4a7fe8"
+        }
+      ]
+    },
+    "7.0": {
+      "version": "7.0.33",
+      "version_id": 70033,
+      "es_revision": 1,
+      "url": "https://museum.php.net/php7/php-7.0.33.tar.xz",
+      "sha256": "ab8c5be6e32b1f8d032909dedaaaa4bbb1a209e519abb01a52ce3914f9a13d96",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=7.0.33",
+      "patches": [
+        {
+          "path": "php-7.0-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "upstream_origin": "712e60f9edfd03f0960fc4fc3c2c375f42b90aa2",
+          "kind": "local-backport",
+          "sha256": "947ea73fdb69e500cdef1c86ba80835c59082ce190f6335a1b2750b762a4dc33"
+        },
+        {
+          "path": "php-7.0-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "d9717a3d81073c56dc370b0a2871b792939b4acf0ab6ab333b02a21eb575c1c8"
+        },
+        {
+          "path": "php-7.0-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "a58d9f45088dfd7fe8e625f279156fcd2aeac2b04c2ea44a4f63ec5dffcb108c"
+        }
+      ]
+    },
+    "8.1": {
+      "version": "8.1.34",
+      "version_id": 80134,
+      "es_revision": 1,
+      "url": "https://www.php.net/distributions/php-8.1.34.tar.xz",
+      "sha256": "ffa9e0982e82eeaea848f57687b425ed173aa278fe563001310ae2638db5c251",
+      "checksum_source": "https://www.php.net/releases/index.php?json&version=8.1.34",
+      "patches": [
+        {
+          "path": "php-8.1-patches/CVE-2026-109618/001-avoid-state-corruption.patch",
+          "url": "https://github.com/php/php-src/commit/1d7dec178a094e6e75b229ce22754045f8c6070a.patch",
+          "sha256": "c85ad0fddcbff7f2318617eeaa54d271135463b5bf70a01228447e3ed78de96e"
+        },
+        {
+          "path": "php-8.1-patches/CVE-2026-109619/002-restore-upload-progress.patch",
+          "kind": "compatibility-override-not-security-fix",
+          "sha256": "a0c078485853ebf7c72d8e342dabddd22c0404df7c81ffb8244d315cc7e9f466"
+        },
+        {
+          "path": "php-8.1-patches/CVE-2026-109619/003-harden-progress-filename.patch",
+          "kind": "injection-hardening-feature-preserving",
+          "sha256": "8a951ec9f80d346d05da5ae9c09ecf3a28f1ba3d2ae22800842030b29095ad56"
+        }
+      ]
+    }
+  }
+}

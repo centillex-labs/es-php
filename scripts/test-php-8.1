@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+mkdir -p work/reports
+docker build -f containers/php-8.1/Dockerfile -t es-php:8.1-test . 2>&1 | tee work/reports/docker-build.log
+docker run --rm --network none es-php:8.1-test
+docker run --rm --network none -e NO_INTERACTION=1 -e REPORT_EXIT_STATUS=1 \
+  es-php:8.1-test sapi/cli/php run-tests.php -q -p /usr/src/php/sapi/cli/php \
+  ext/zend_test/tests/observer_bug81430_2.phpt \
+  ext/zend_test/tests/observer_bug81435.phpt \
+  ext/zend_test/tests/observer_error_01.phpt \
+  2>&1 | tee work/reports/docker-tests.log

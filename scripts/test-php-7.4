@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+mkdir -p work/reports
+docker build -f containers/php-7.4/Dockerfile -t es-php:7.4-test . 2>&1 | tee work/reports/php-7.4-build.log
+docker run --rm --network none es-php:7.4-test
+docker run --rm --network none es-php:7.4-test sapi/fpm/php-fpm -v
+# Preserve failure status: the upstream EOL patch disables upload progress,
+# so eight legacy rfc1867 tests currently fail. Do not silently suppress them.
+docker run --rm --network none -e NO_INTERACTION=1 -e REPORT_EXIT_STATUS=1 \
+  es-php:7.4-test sapi/cli/php run-tests.php -q -p /usr/src/php/sapi/cli/php \
+  ext/session/tests ext/standard/tests/serialize \
+  2>&1 | tee work/reports/php-7.4-tests.log

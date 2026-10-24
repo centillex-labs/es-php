@@ -1,0 +1,7 @@
+# Local PHP 7.3 adaptation of upstream 712e60f9edfd03f0960fc4fc3c2c375f42b90aa2.
+# Combined CVE-2026-109618 / CVE-2026-109619 EOL mitigation.
+CVE-2026-109618/001-avoid-state-corruption.patch
+# 002: compatibility override preserving upload progress. # 003: php2shell Chain A hardening
+# (percent-encode < in progress filenames); feature behavior otherwise preserved.
+CVE-2026-109619/002-restore-upload-progress.patch
+CVE-2026-109619/003-harden-progress-filename.patch
