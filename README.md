@@ -18,8 +18,8 @@ these narrow changes do not address all their known vulnerabilities.
 Current results and policy: [upload-progress compatibility](security/upload-progress-compatibility.md).
 **php2shell PoC replay: Chain A RCE blocked by the progress-record hardening
 (in default series); Chain C (handler mismatch) reproduces unpatched and is
-blocked by it; Chain B is not applicable to 5.4 (Valgrind, with an 8.1
-control); OOM chains did not reproduce.**
+blocked by it on 5.4, 5.5 and 5.6; Chain B is not applicable to any PHP 5
+branch (Valgrind, with an 8.1 control); OOM chains did not reproduce.**
 Details: [replay report](security/php2shell-poc-replay.md).
 The CVE-2026-115560 serializer-policy candidate remains held and excluded from
 default builds.
