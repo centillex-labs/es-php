@@ -22,9 +22,11 @@ original session implementation; it does not introduce a serializer restriction
 or the held 115560 prerequisites. Those candidates remain excluded.
 
 **Real-vector results (after hardening):** a follow-up patch
-(`CVE-2026-109619/003-harden-progress-filename.patch`) percent-encodes `<` in
-progress filenames, closing the php2shell Chain A RCE path (session file
-turns over no PHP open tags) while keeping the feature and INI control.
+(`CVE-2026-109619/003-harden-progress-record.patch`) percent-encodes `<` and
+`|` in every attacker-controlled string written to the session progress record
+(key suffix, `field_name`, `name`), closing the php2shell Chain A RCE path and
+the handler-mismatch delimiter primitive, while keeping the feature and INI
+control.
 Chains D/E memory corruption did not reproduce; workers die cleanly on OOM.
 Details: [php2shell PoC replay](php2shell-poc-replay.md).
 

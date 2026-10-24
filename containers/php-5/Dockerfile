@@ -11,7 +11,7 @@ RUN echo "${SHA256}  /tmp/php.tar.gz" | sha256sum -c - \
     && tar -xzf /tmp/php.tar.gz --strip-components=1 && rm /tmp/php.tar.gz
 COPY php-${BRANCH}-patches/series /patches/series
 COPY php-${BRANCH}-patches/CVE-2026-109619/002-restore-upload-progress.patch /patches/CVE-2026-109619/002-restore-upload-progress.patch
-COPY php-${BRANCH}-patches/CVE-2026-109619/003-harden-progress-filename.patch /patches/CVE-2026-109619/003-harden-progress-filename.patch
+COPY php-${BRANCH}-patches/CVE-2026-109619/003-harden-progress-record.patch /patches/CVE-2026-109619/003-harden-progress-record.patch
 COPY php-${BRANCH}-patches/CVE-2026-109618/001-avoid-state-corruption.patch /patches/CVE-2026-109618/001-avoid-state-corruption.patch
 RUN set -eu; while IFS= read -r patchfile; do \
       case "$patchfile" in ''|'#'*) continue ;; esac; \

@@ -35,14 +35,16 @@ With plain feature restore, **Chain A achieved RCE on every branch**
 (`[+] RCE CONFIRMED: uid=0(root)`): the raw `<?php …?>` upload filename was
 stored verbatim in the session file, and the LFI sink executed it.
 
-## Hardening: 003-harden-progress-filename.patch
+## Hardening: 003-harden-progress-record.patch
 
 Applied to every default series after a debugging pass:
 
-- The vector is the raw filename stored at `MULTIPART_EVENT_FILE_START`
-  (`session.c`). The fix percent-encodes **only `<`** in the stored
-  progress-record `name` (`php_session_rfc1867_safe_name()`); benign filenames
-  stay byte-identical, and `$_FILES` behavior is untouched.
+- The vector is the raw values stored in the session progress record at
+  `MULTIPART_EVENT_FILE_START` (`session.c`). Three strings are attacker
+  controlled: the session key suffix (the `PHP_SESSION_UPLOAD_PROGRESS` field
+  value), the per-file `field_name`, and the per-file `name` (filename). The
+  fix percent-encodes **`<` and `|`** (plus NUL) in the stored copies
+  (`php_session_rfc1867_safe_str()`); benign values stay byte-identical.
 - Debugging was byte-level (no rr needed — deterministic data flow): `od -c`
   of session files confirmed `%3C?php` replaces `<?php` in the file.
 - **Toolkit false positive:** the exploit still printed `RCE CONFIRMED`, but
@@ -55,8 +57,9 @@ Applied to every default series after a debugging pass:
   `efree(NULL)` tripped PHP 5's debug allocator (`Block 0x00000000 status:
   NULL`, failing `rfc1867_sid_invalid.phpt` on 5.4/5.5/5.6 debug). Fixed with a
   NULL guard; the test now passes everywhere.
-- A new PHPT (`rfc1867_filename_encoding.phpt`) ships in each patch and runs
-  in the standard suites.
+- A new PHPT (`rfc1867_progress_encoding.phpt`) ships in each patch and runs
+  in the standard suites; it asserts all three fields are encoded and that
+  benign values are unchanged.
 
 ## Final results (hardened default series, all nine branches)
 
@@ -64,7 +67,7 @@ Applied to every default series after a debugging pass:
 |---|---|
 | Chain A true RCE (requires `uid=` output) | **Blocked** on all 9 |
 | Chain A toolkit verdict (naive markers) | still prints RCE CONFIRMED (false positive, text echo) |
-| Session file contents | encoded (`%3C`), no `<?php` bytes |
+| Session file contents | encoded (`%3C`, `%7C`), no `<?php` bytes |
 | Chain B | inconclusive (symbol lookup fails on these builds) |
 | Chain E (adapted FPM) | producer worker terminated on decode OOM; consumer on fresh worker; pool recovered; no stale-state markers |
 | Post-OOM HTTP | server healthy or cleanly dead; never corrupted-state |

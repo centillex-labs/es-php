@@ -66,8 +66,10 @@ Headline:
 | Test | Baseline | Patched |
 |---|---|---|
 | 619 filename `<?php …` | stored **raw** | stored as `%3C?php …` |
-| 619 benign `normal.txt` | unchanged | **unchanged** |
-| 619 filename `x\|O:8:…` | pipe kept | **pipe kept (gap)** |
+| 619 field name `<?php …` | stored **raw** | stored as `%3C?php …` |
+| 619 progress value `<?php …` | stored **raw** (byte 0 of file) | stored as `%3C?php …` |
+| 619 benign values | unchanged | **unchanged** |
+| 619 `\|` delimiter | pipe kept | **pipe encoded (`%7C`)** |
 | 618 chunked OOM | process alive but **wedged**, port held | **exits 1** (fail-stop) |
 | 618 CLI OOM probes | exit 255 | exit 1 |
 
@@ -102,7 +104,8 @@ between patched and unpatched PHP rather than always reporting success.
   reuse, recycling or post-OOM recovery** cannot be done here — use
   `scripts/test-php7-fpm.py` and `tests/php2shell-poc/replay.py` for those.
 - Chain C (handler mismatch) is not runnable without per-directory `.user.ini`
-  support, and the `|` primitive it needs is still present in session files.
+  support; the `|` delimiter it needs is now encoded, so the primitive is gone
+  even though the chain itself remains untested end-to-end.
 - `--disable-all` builds omit `ext/hash` and `ext/ctype`. Fixtures must not use
   `hash()`, `hash_equals()` or `ctype_*`.
 - Not covered: sanitizers, ZTS, mod_php, OPcache runtime, 32-bit, and the

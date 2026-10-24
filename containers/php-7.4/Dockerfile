@@ -8,7 +8,7 @@ RUN echo '924846abf93bc613815c55dd3f5809377813ac62a9ec4eb3778675b82a27b927  /tmp
     && tar -xJf /tmp/php.tar.xz --strip-components=1 && rm /tmp/php.tar.xz
 COPY php-7.4-patches/series /patches/series
 COPY php-7.4-patches/CVE-2026-109619/002-restore-upload-progress.patch /patches/CVE-2026-109619/002-restore-upload-progress.patch
-COPY php-7.4-patches/CVE-2026-109619/003-harden-progress-filename.patch /patches/CVE-2026-109619/003-harden-progress-filename.patch
+COPY php-7.4-patches/CVE-2026-109619/003-harden-progress-record.patch /patches/CVE-2026-109619/003-harden-progress-record.patch
 COPY php-7.4-patches/CVE-2026-109618/001-avoid-state-corruption.patch /patches/CVE-2026-109618/001-avoid-state-corruption.patch
 RUN set -eu; while IFS= read -r patchfile; do \
       case "$patchfile" in ''|'#'*) continue ;; esac; \

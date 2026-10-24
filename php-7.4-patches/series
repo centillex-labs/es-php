@@ -1,6 +1,6 @@
 # Combined upstream EOL mitigation: CVE-2026-109618 and CVE-2026-109619.
 CVE-2026-109618/001-avoid-state-corruption.patch
-# 002: compatibility override preserving upload progress. # 003: php2shell Chain A hardening
+# 002: compatibility override preserving upload progress. # 003: harden the whole progress record (encode < and | in key, field_name and name).
 # (percent-encode < in progress filenames); feature behavior otherwise preserved.
 CVE-2026-109619/002-restore-upload-progress.patch
-CVE-2026-109619/003-harden-progress-filename.patch
+CVE-2026-109619/003-harden-progress-record.patch

@@ -16,8 +16,9 @@ enabled remains unverified, pending real-vector testing. PHP 5/7/8.1 remain EOL;
 these narrow changes do not address all their known vulnerabilities.
 
 Current results and policy: [upload-progress compatibility](security/upload-progress-compatibility.md).
-**php2shell PoC replay: Chain A RCE blocked by the filename-encoding hardening
-(in default series), memory-corruption chains did not reproduce.**
+**php2shell PoC replay: Chain A RCE blocked by the progress-record hardening
+(in default series); the handler-mismatch `|` delimiter is encoded too;
+memory-corruption chains did not reproduce.**
 Details: [replay report](security/php2shell-poc-replay.md).
 The CVE-2026-115560 serializer-policy candidate remains held and excluded from
 default builds.
