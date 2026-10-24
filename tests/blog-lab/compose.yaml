@@ -1,0 +1,39 @@
+services:
+  blog:
+    image: ${BLOG_IMAGE:-es-php:5.4-test}
+    user: "65534:65534"
+    working_dir: /usr/src/php
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - >-
+        mkdir -p /data/sessions /data/uploads;
+        exec sapi/cli/php -n -d memory_limit=24M
+        -d session.save_path=/data/sessions
+        -d session.upload_progress.enabled=1
+        -d session.upload_progress.cleanup=0
+        -d session.upload_progress.min_freq=0
+        -d session.upload_progress.freq=0
+        -d upload_max_filesize=1M -d post_max_size=2M
+        -d display_errors=0 -d log_errors=1
+        -S 0.0.0.0:8080 -t /web
+    environment:
+      BLOG_PASSWORD: ${BLOG_PASSWORD:?Set BLOG_PASSWORD to a disposable lab password}
+      BLOG_LAB_ENABLED: ${BLOG_LAB_ENABLED:-0}
+    ports:
+      - "127.0.0.1:${BLOG_PORT:-8054}:8080"
+    volumes:
+      - ./web:/web:ro
+    tmpfs:
+      - /data:rw,noexec,nosuid,size=16m,mode=1777
+      - /tmp:rw,noexec,nosuid,size=4m,mode=1777
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 96m
+    cpus: 0.5
+    pids_limit: 32
+    logging:
+      driver: json-file
+      options:
+        max-size: "1m"
+        max-file: "1"

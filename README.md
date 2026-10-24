@@ -51,6 +51,7 @@ See [RELEASING.md](RELEASING.md) for the release process and
 - `scripts/es-release.py`: builds publishable LTS tarballs.
 - `scripts/verify-release-tarball.sh`: compiles and validates a release.
 - `scripts/check-consistency.py`: offline lock/series/hash check.
+- `tests/blog-lab/`: tiny PHP 5.4 blog fixture + patched/unpatched A/B runner.
 - `security/cves/`: per-CVE tracking.
 - `containers/`: Docker development build/test images.
 - `work/reports/`: local logs (ignored).
@@ -78,6 +79,21 @@ Tarballs must already exist under downloads; URLs and published checksums are
 in sources.lock.json. Builds use a fresh extraction inside Docker, not host
 scratch trees. PHP 5 includes JSON/session/CLI/FPM; bundled OPcache exists only
 from 5.5 onward. PHP 7/8 builds include OPcache; PHP 8.1 also includes zend_test.
+
+## Blog lab
+
+`tests/blog-lab/` is a small PHP 5.4-compatible blog used as a realistic test
+application (~2.3 MiB RSS, no database, loopback-only, tmpfs storage):
+
+```sh
+export BLOG_PASSWORD=labpassword
+bash tests/blog-lab/run.sh     # patched LTS vs unpatched baseline
+```
+
+The unpatched baseline for differential testing comes from
+`containers/php-5/Dockerfile.baseline` (deliberately vulnerable; local use
+only). See [tests/blog-lab/README.md](tests/blog-lab/README.md) for what a
+passing run does and does not prove.
 
 Direct HTTP tests expose randomly allocated **127.0.0.1-only** ports, with no
 WAF. CLI/PHPT tests use network-disabled containers. These are development
