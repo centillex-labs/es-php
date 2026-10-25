@@ -13,7 +13,7 @@ Do not infer immunity from an unsupported branch being absent from a CVE record.
 
 | CVE | 5.4 | 5.5 | 5.6 | Next gate |
 | --- | --- | --- | --- | --- |
-| CVE-2016-7124 | Backport review | Backport review | Upstream fix reported in 5.6.25; verify locally | Locate complete PHP 5 semantic fix and negative control |
+| CVE-2016-7124 | Fixed + tested | Fixed + tested | Already fixed upstream (verified) | Baseline control confirms 5.4/5.5 were vulnerable |
 | CVE-2018-14883 | Applicability review | Applicability review | Upstream fix reported in 5.6.37; verify locally | Compare EXIF implementation and upstream fix |
 | CVE-2019-11043 | Fixed + tested | Fixed + tested | Fixed + tested | Enabled in series; Docker FPM differential passes |
 | CVE-2019-11046 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Inspect BCMath fix and configuration conditions |

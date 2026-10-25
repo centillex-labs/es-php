@@ -12,7 +12,7 @@
     "5.4": {
       "version": "5.4.45",
       "version_id": 50445,
-      "es_revision": 2,
+      "es_revision": 3,
       "url": "https://museum.php.net/php5/php-5.4.45.tar.gz",
       "sha256": "25bc4723955f4e352935258002af14a14a9810b491a19400d76fcdfa9d04b28f",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.4.45",
@@ -38,13 +38,19 @@
           "upstream_origin": "ab061f95ca966731b1c84cf5b7b20155c0a1c06a",
           "kind": "upstream-backport-candidate",
           "sha256": "f73d1cd20e77e958d056c08f5a9504cd753661bbe33ebad1c2a4494477fbd281"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2016-7124/001-destroy-broken-object.patch",
+          "upstream_origin": "448c9be157f4147e121f1a2a524536c75c9c6059",
+          "kind": "upstream-backport",
+          "sha256": "12da1bc20fe8341853f42d1b440ded6b2a813da12fb68ffdd3e1dbe15b719079"
         }
       ]
     },
     "5.5": {
       "version": "5.5.38",
       "version_id": 50538,
-      "es_revision": 2,
+      "es_revision": 3,
       "url": "https://museum.php.net/php5/php-5.5.38.tar.gz",
       "sha256": "4f458c9b504269615715a62f182b7c2f89bb8284f484befc221b56a1571b506e",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.5.38",
@@ -70,6 +76,12 @@
           "upstream_origin": "ab061f95ca966731b1c84cf5b7b20155c0a1c06a",
           "kind": "upstream-backport-candidate",
           "sha256": "9f3815026f6a9e440f3529cd9df2ee30a7a9107b482db0b5bfc112543a6c4e5e"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2016-7124/001-destroy-broken-object.patch",
+          "upstream_origin": "448c9be157f4147e121f1a2a524536c75c9c6059",
+          "kind": "upstream-backport",
+          "sha256": "12da1bc20fe8341853f42d1b440ded6b2a813da12fb68ffdd3e1dbe15b719079"
         }
       ]
     },
