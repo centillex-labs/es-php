@@ -1,8 +1,43 @@
 # Production runtime image plan
 
-Status: **planned; not built or published yet**. This document records the agreed
-LTS 1 production matrix. Existing Dockerfiles elsewhere under `containers/` are
-test infrastructure, not the production images described here.
+Status: **one pilot image built, nothing published.** `Dockerfile.apache` builds
+the Apache (mod_php) variant for 5.6 from a published LTS tarball; the CLI/FPM
+variants and the GHCR publishing workflow do not exist yet. Dockerfiles elsewhere
+under `containers/` remain test infrastructure.
+
+## Pilot: Apache variant
+
+`Dockerfile.apache` is the reference shape. It downloads the release asset,
+verifies `LTS_SHA256`, builds with `--prefix=/usr/local` and
+`--with-config-file-scan-dir=/usr/local/etc/php/conf.d`, then copies the tree and
+`libphp5.so` into a clean `bookworm-slim` runtime with Apache prefork.
+
+It follows the Docker Official PHP Image layout on purpose — `/usr/local/bin/php`,
+`PHP_INI_DIR=/usr/local/etc/php`, `conf.d`, `/var/www/html`, listen 80 — so an
+application can move between the official images and ours without rewriting its
+compose files or its INI mounts.
+
+```sh
+docker build -f containers/release/Dockerfile.apache -t es-php:5.6-apache .
+# other branches: override all three, e.g. 5.4
+docker build -f containers/release/Dockerfile.apache -t es-php:5.4-apache \
+  --build-arg LTS_URL=https://github.com/centillex-labs/es-php/releases/download/lts2/php-5.4.45-lts2.tar.gz \
+  --build-arg LTS_SHA256=a2ae102c9c99034a1d72ad44fba1cdb4b085800b662669d7030c1ddd2e9f91cc .
+```
+
+Verified on the 5.6 pilot: `PHP 5.6.40-lts2`, SAPI `apache2handler`, `conf.d`
+honoured without `PHP_INI_SCAN_DIR`, `session.upload_progress.enabled=1`,
+`/etc/apache2/conf-enabled/*.conf` mounts apply (a mounted
+`MaxConnectionsPerChild 1` yields a new worker PID per request).
+
+Deliberate deviations, still accurate for this pilot: no `docker-php-ext-*`
+helpers (extensions are compiled in — PECL cannot serve these branches), and
+upload progress stays enabled by LTS policy. `EXTRAS` controls the compiled
+extension set; the default adds `hash`, `ctype`, `tokenizer`, `filter` on top of
+`session` and `json`.
+
+Known gaps in the pilot: no CLI or FPM variant yet, no digest pinning of the
+Debian base, no OCI labels, no CI publish job, and no arm64.
 
 Product: **Extended Support PHP**
 

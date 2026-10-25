@@ -1,0 +1,142 @@
+# Extended Support PHP — Apache (mod_php) runtime image.
+#
+# Built from a published LTS release tarball, not from a git checkout and not
+# from a patched working tree: the archive is downloaded, its SHA-256 is
+# verified, and nothing is patched afterwards. What ships is exactly what
+# `es-release.py` produced and what CI compiled.
+#
+# Layout follows the Docker Official PHP Images so an application can move
+# between them without surprises:
+#
+#   /usr/local/bin/php        PHP binary
+#   /usr/local/etc/php/       PHP_INI_DIR (php.ini + conf.d)
+#   /var/www/html             DocumentRoot
+#   listen 80                 Apache prefork + mod_php
+#
+# Deliberate differences from the official images (documented, not accidental):
+#   * no docker-php-ext-* / docker-php-source helpers -- extensions are compiled
+#     in at build time, because these branches cannot use current PECL releases
+#   * session.upload_progress.enabled=1 is the LTS policy, not the upstream EOL
+#     mitigation
+#   * PHP 5.x has no OPcache before 5.5 and no bundled OPcache for 5.4
+#
+# Test/demo builds only until the publishing workflow exists. Not a claim of
+# parity with supported PHP.
+
+ARG DEBIAN_VERSION=bookworm
+
+# --- build stage -------------------------------------------------------------
+FROM debian:${DEBIAN_VERSION}-slim AS build
+
+# apache2 (not only apache2-dev) is required at build time: `make install`
+# drives apxs2, which shells out to /usr/sbin/apache2.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential autoconf bison re2c pkg-config ca-certificates \
+      curl gzip xz-utils apache2 apache2-dev libxml2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Published release asset + its digest. Override both or neither.
+ARG LTS_URL=https://github.com/centillex-labs/es-php/releases/download/lts2/php-5.6.40-lts2.tar.gz
+ARG LTS_SHA256=7da867d64cd06bc757ca5d8bfb7d56ad76a08b16540662d0f06096bd37791f55
+
+RUN set -eu; \
+    curl -fsSL "$LTS_URL" -o /tmp/php.tar.gz; \
+    echo "$LTS_SHA256  /tmp/php.tar.gz" | sha256sum -c -; \
+    mkdir -p /usr/src/php; \
+    tar -xf /tmp/php.tar.gz -C /usr/src/php --strip-components=1; \
+    rm /tmp/php.tar.gz
+
+WORKDIR /usr/src/php
+
+# These sources predate current bison/re2c, so the shipped parser sources are
+# kept. -fcommon keeps old tentative definitions working on GCC 10+.
+ARG JOBS=4
+ARG EXTRAS="--enable-hash --enable-ctype --enable-tokenizer --enable-filter"
+RUN set -eu; \
+    CFLAGS='-O2 -g -fcommon' ./configure \
+      --prefix=/usr/local \
+      --with-apxs2=/usr/bin/apxs2 \
+      --with-config-file-path=/usr/local/etc/php \
+      --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
+      --disable-all \
+      --enable-session --enable-json $EXTRAS \
+    && make -j"$JOBS" \
+    && make install \
+    && mkdir -p /staging
+
+# libphp5.so lives in libs/ until a web server installs it; keep a copy for the
+# runtime stage so the module and the CLI come from the same build.
+RUN cp /usr/src/php/libs/libphp5.so /staging/ && \
+    cp /usr/src/php/php.ini-production /staging/php.ini-production
+
+# --- runtime stage -----------------------------------------------------------
+FROM debian:${DEBIAN_VERSION}-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      apache2 ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /usr/local /usr/local
+COPY --from=build /staging/libphp5.so /usr/lib/apache2/modules/libphp5.so
+COPY --from=build /staging/php.ini-production /usr/local/etc/php/php.ini-production
+
+# mod_php needs the prefork MPM; Debian defaults to event.
+RUN set -eu; \
+    a2dismod mpm_event mpm_worker || true; \
+    a2enmod mpm_prefork; \
+    a2enmod rewrite headers; \
+    mkdir -p /usr/local/etc/php/conf.d /var/www/html; \
+    cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini; \
+    printf '%s\n' \
+      'LoadModule php5_module /usr/lib/apache2/modules/libphp5.so' \
+      '<FilesMatch ".+\.ph(ar|p|tml)$">' \
+      '    SetHandler application/x-httpd-php' \
+      '</FilesMatch>' \
+      '<FilesMatch ".+\.phps$">' \
+      '    Require all denied' \
+      '</FilesMatch>' \
+      > /etc/apache2/conf-available/docker-php.conf; \
+    a2enconf docker-php; \
+    printf '%s\n' \
+      'ServerName localhost' \
+      'DocumentRoot /var/www/html' \
+      '<Directory /var/www/html>' \
+      '    Options -Indexes +FollowSymLinks' \
+      '    AllowOverride None' \
+      '    Require all granted' \
+      '</Directory>' \
+      'ErrorLog /proc/self/fd/2' \
+      'CustomLog /proc/self/fd/1 combined' \
+      > /etc/apache2/conf-available/es-php.conf; \
+    # Debian's ports.conf already declares `Listen 80`; declaring it again makes
+    # Apache abort with "Cannot define multiple Listeners on the same IP:port".
+    grep -q '^Listen 80$' /etc/apache2/ports.conf; \
+    a2enconf es-php; \
+    rm -f /etc/apache2/sites-enabled/*; \
+    chown -R www-data:www-data /var/www/html
+
+# Upload progress is preserved on every Extended Support PHP build by policy.
+# Keep this visible: the upstream EOL mitigation disables it.
+RUN printf '%s\n' \
+      '; Extended Support PHP defaults' \
+      'session.upload_progress.enabled = 1' \
+      'expose_php = Off' \
+      'date.timezone = UTC' \
+      'memory_limit = 128M' \
+      'post_max_size = 8M' \
+      'upload_max_filesize = 2M' \
+      'max_input_vars = 1000' \
+      > /usr/local/etc/php/conf.d/zz-es-php.ini
+
+ENV PHP_INI_DIR=/usr/local/etc/php \
+    APACHE_CONFDIR=/etc/apache2 \
+    APACHE_RUN_USER=www-data \
+    APACHE_RUN_GROUP=www-data \
+    APACHE_LOG_DIR=/var/log/apache2 \
+    APACHE_PID_FILE=/var/run/apache2/apache2.pid \
+    APACHE_RUN_DIR=/var/run/apache2 \
+    APACHE_LOCK_DIR=/var/lock/apache2
+
+EXPOSE 80
+
+CMD ["apachectl", "-D", "FOREGROUND"]
