@@ -1,0 +1,40 @@
+{
+  "purpose": "Frozen vendor applicability evidence for CVE-2026-109618 and CVE-2026-109619",
+  "affected_versions": [
+    "< 8.2.35",
+    "< 8.3.36",
+    "< 8.4.27",
+    "< 8.5.12"
+  ],
+  "patched_versions": [
+    "8.2.35",
+    "8.3.36",
+    "8.4.27",
+    "8.5.12"
+  ],
+  "php56_status": "not listed in affected ranges",
+  "mitigation_commit": {
+    "id": "1d7dec178a094e6e75b229ce22754045f8c6070a",
+    "subject": "Avoid state corruption via bailout",
+    "self_description": "Minimal mitigation for EOL version",
+    "fixes": [
+      "GHSA-w8hw-w9fx-j79w",
+      "GHSA-6wmf-4rv5-p3rp"
+    ]
+  },
+  "advisories": [
+    {
+      "ghsa": "GHSA-w8hw-w9fx-j79w",
+      "source": "https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w",
+      "retrieved_at": "2026-10-25T11:30:00Z",
+      "sha256": "d72350de03d1804425a035e151021be7b421f26c5ca4965b68c99c3ac2785c31"
+    },
+    {
+      "ghsa": "GHSA-6wmf-4rv5-p3rp",
+      "source": "https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp",
+      "retrieved_at": "2026-10-25T11:30:00Z",
+      "sha256": "98011bed9b81aea7abb44d456661f36e2d7d488d3a458fb2d8c055138751be1b"
+    }
+  ],
+  "warning": "Snapshot for scoping only. Absence from an affected range is not proof of immunity to similar bugs."
+}
