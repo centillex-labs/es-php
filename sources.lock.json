@@ -12,7 +12,7 @@
     "5.4": {
       "version": "5.4.45",
       "version_id": 50445,
-      "es_revision": 1,
+      "es_revision": 2,
       "url": "https://museum.php.net/php5/php-5.4.45.tar.gz",
       "sha256": "25bc4723955f4e352935258002af14a14a9810b491a19400d76fcdfa9d04b28f",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.4.45",
@@ -32,13 +32,19 @@
           "path": "php-5.4-patches/CVE-2026-109619/003-harden-progress-record.patch",
           "kind": "injection-hardening-feature-preserving",
           "sha256": "656b06d5ac6045da8a7c0d4e0cdc9e9b8fba83c130478731c015d2e379d67208"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2019-11043/001-bound-path-info.patch",
+          "upstream_origin": "ab061f95ca966731b1c84cf5b7b20155c0a1c06a",
+          "kind": "upstream-backport-candidate",
+          "sha256": "f73d1cd20e77e958d056c08f5a9504cd753661bbe33ebad1c2a4494477fbd281"
         }
       ]
     },
     "5.5": {
       "version": "5.5.38",
       "version_id": 50538,
-      "es_revision": 1,
+      "es_revision": 2,
       "url": "https://museum.php.net/php5/php-5.5.38.tar.gz",
       "sha256": "4f458c9b504269615715a62f182b7c2f89bb8284f484befc221b56a1571b506e",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.5.38",
@@ -58,13 +64,19 @@
           "path": "php-5.5-patches/CVE-2026-109619/003-harden-progress-record.patch",
           "kind": "injection-hardening-feature-preserving",
           "sha256": "1b7cb09167a18587a0b2868a466eb8497c065d7ede44fd52fca8c842cb58f429"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2019-11043/001-bound-path-info.patch",
+          "upstream_origin": "ab061f95ca966731b1c84cf5b7b20155c0a1c06a",
+          "kind": "upstream-backport-candidate",
+          "sha256": "9f3815026f6a9e440f3529cd9df2ee30a7a9107b482db0b5bfc112543a6c4e5e"
         }
       ]
     },
     "5.6": {
       "version": "5.6.40",
       "version_id": 50640,
-      "es_revision": 1,
+      "es_revision": 2,
       "url": "https://museum.php.net/php5/php-5.6.40.tar.gz",
       "sha256": "56fb9878d12fdd921f6a0897e919f4e980d930160e154cbde2cc6d9206a27cac",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.6.40",
@@ -84,6 +96,12 @@
           "path": "php-5.6-patches/CVE-2026-109619/003-harden-progress-record.patch",
           "kind": "injection-hardening-feature-preserving",
           "sha256": "639de7a2dacbc5362450d7f2d67710742e85ade1942c83c32e27436901618831"
+        },
+        {
+          "path": "php-5.6-patches/CVE-2019-11043/001-bound-path-info.patch",
+          "upstream_origin": "ab061f95ca966731b1c84cf5b7b20155c0a1c06a",
+          "kind": "upstream-backport-candidate",
+          "sha256": "bb8949f3caf84ca1e0840a94457c4c36f137a151ac5c51013b02ce2eec3e4918"
         }
       ]
     },

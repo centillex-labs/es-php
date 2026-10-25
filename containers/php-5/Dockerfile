@@ -13,6 +13,7 @@ COPY php-${BRANCH}-patches/series /patches/series
 COPY php-${BRANCH}-patches/CVE-2026-109619/002-restore-upload-progress.patch /patches/CVE-2026-109619/002-restore-upload-progress.patch
 COPY php-${BRANCH}-patches/CVE-2026-109619/003-harden-progress-record.patch /patches/CVE-2026-109619/003-harden-progress-record.patch
 COPY php-${BRANCH}-patches/CVE-2026-109618/001-avoid-state-corruption.patch /patches/CVE-2026-109618/001-avoid-state-corruption.patch
+COPY php-${BRANCH}-patches/CVE-2019-11043/001-bound-path-info.patch /patches/CVE-2019-11043/001-bound-path-info.patch
 RUN set -eu; while IFS= read -r patchfile; do \
       case "$patchfile" in ''|'#'*) continue ;; esac; \
       patch --batch --fuzz=0 -p1 < "/patches/$patchfile"; \

@@ -23,6 +23,7 @@ COPY php-${BRANCH}-patches/series /patches/series
 COPY php-${BRANCH}-patches/CVE-2026-109619/002-restore-upload-progress.patch /patches/CVE-2026-109619/002-restore-upload-progress.patch
 COPY php-${BRANCH}-patches/CVE-2026-109619/003-harden-progress-record.patch /patches/CVE-2026-109619/003-harden-progress-record.patch
 COPY php-${BRANCH}-patches/CVE-2026-109618/001-avoid-state-corruption.patch /patches/CVE-2026-109618/001-avoid-state-corruption.patch
+COPY php-${BRANCH}-patches/CVE-2019-11043/001-bound-path-info.patch /patches/CVE-2019-11043/001-bound-path-info.patch
 
 # SKIP_PATCHES=1 builds the unpatched baseline for A/B comparison.
 ARG SKIP_PATCHES=0

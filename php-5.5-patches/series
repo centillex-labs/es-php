@@ -4,3 +4,4 @@ CVE-2026-109618/001-avoid-state-corruption.patch
 # (percent-encode < in progress filenames); feature behavior otherwise preserved.
 CVE-2026-109619/002-restore-upload-progress.patch
 CVE-2026-109619/003-harden-progress-record.patch
+CVE-2019-11043/001-bound-path-info.patch
