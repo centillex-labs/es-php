@@ -1,0 +1,206 @@
+# P1 — source applicability of the CVE-2026-109618/619 mechanisms in PHP 5.6.40
+#
+# Method: read the pristine 5.6.40 tree (downloads/php-5.6.40.tar.gz), cite the
+# exact baseline lines that make a mechanism reachable, and state what the
+# LTS2 build is expected to change. No request was sent to any runtime for this
+# file, so every entry is a source-review result, not an exploit result.
+#
+# applicability values:
+#   applicable      mechanism reachable in baseline 5.6.40 under stated preconditions
+#   limited         reachable only when documented INI limits are raised
+#   not_applicable  no reachable path found in this tree
+#   inconclusive    producer present but no consumer/effect path identified
+#
+# `tests/cve-lab/` consumes this map: a vector may only become a claim scenario
+# when applicability is applicable/limited and the preconditions are probed.
+# Verify with: python3 scripts/check-php56-applicability.py
+
+target: php-5.6.40
+baseline_source: downloads/php-5.6.40.tar.gz
+reviewed_at: 2026-10-25
+reviewer: Centillex
+patch_series: php-5.6-patches/series
+
+vectors:
+  - id: V1
+    class: CVE-2026-109618
+    mechanism: multipart request without a usable declared length
+    applicability: applicable
+    confidence: high
+    rationale: >-
+      mod_php sets request content_length to 0 when the header is absent, so the
+      early post_max_size comparison at SAPI.c:275 and the duplicate check at
+      rfc1867.c:715 never trip. The body is still streamed into a temp stream,
+      and SAPI.c:301 only stops reading once read_post_bytes exceeds
+      post_max_size. OOM can therefore happen while the parser builds part
+      structures, not while reading bytes; the precondition is a body size and
+      parser amplification that together exceed memory_limit.
+    citations:
+      - {file: sapi/apache2handler/sapi_apache2.c, line: 486, token: "content_length ? atol"}
+      - {file: main/SAPI.c, line: 275, token: "post_max_size"}
+      - {file: main/SAPI.c, line: 301, token: "read_post_bytes"}
+      - {file: main/rfc1867.c, line: 715, token: "post_max_size"}
+    preconditions:
+      - "post_max_size >= memory_limit, or an amplification factor large enough that the parsed form exceeds memory_limit"
+      - "multipart/form-data body sent with chunked encoding or no Content-Length"
+    expected_baseline: OOM while multipart structures are built, before the script runs
+    expected_lts2: process exits through the safe-error path with no destructors or shutdown callbacks
+    attributed_patch: CVE-2026-109618/001-avoid-state-corruption.patch
+
+  - id: V2
+    class: CVE-2026-109618
+    mechanism: many part headers inside one part
+    applicability: applicable
+    confidence: high
+    rationale: >-
+      multipart_buffer_headers loops until a blank line with no count or byte
+      cap, duplicating every header name and appending every continuation line
+      into the request arena. Nothing bounds the number of header lines other
+      than the total body size, which V1 shows can be decoupled from the early
+      post_max_size check.
+    citations:
+      - {file: main/rfc1867.c, line: 418, token: "line[0] != '\\0'"}
+      - {file: main/rfc1867.c, line: 438, token: "zend_llist_add_element"}
+      - {file: main/rfc1867.c, line: 446, token: "key = estrdup(line)"}
+    preconditions:
+      - "post_max_size large enough to carry the header block"
+      - "memory_limit low enough that accumulated header strings exceed it"
+    expected_baseline: memory growth proportional to header count, OOM under a tight limit
+    expected_lts2: only Content-Disposition and Content-Type are retained, duplicates ignored
+    attributed_patch: CVE-2026-109618/001-avoid-state-corruption.patch
+
+  - id: V3
+    class: CVE-2026-109618
+    mechanism: many empty file controls bypass max_file_uploads
+    applicability: applicable
+    confidence: high
+    rationale: >-
+      upload_cnt is decremented only when a temp file is opened. An empty
+      filename sets cancel_upload at line 995 and skips the whole block at 1005,
+      so the counter is never consumed. File parts also do not increment the
+      max_input_vars counter, which is raised only on the form-data branch at
+      line 874, leaving file parts bounded by neither limit.
+    citations:
+      - {file: main/rfc1867.c, line: 698, token: "upload_cnt"}
+      - {file: main/rfc1867.c, line: 874, token: "++count <= PG(max_input_vars)"}
+      - {file: main/rfc1867.c, line: 995, token: "filename[0]"}
+      - {file: main/rfc1867.c, line: 1005, token: "!cancel_upload"}
+      - {file: main/rfc1867.c, line: 1015, token: "upload_cnt--"}
+    preconditions:
+      - "max_file_uploads small, unlimited empty file controls in one body"
+    expected_baseline: per-part allocation continues past max_file_uploads
+    expected_lts2: total body parts are capped by max_multipart_body_parts, which defaults to max_input_vars + max_file_uploads
+    attributed_patch: CVE-2026-109618/001-avoid-state-corruption.patch
+
+  - id: V4
+    class: CVE-2026-109618
+    mechanism: deeply nested field names
+    applicability: limited
+    confidence: medium
+    rationale: >-
+      Nested names are bounded before allocation by max_input_nesting_level
+      (default 64) in php_register_variable_ex, and field parts also count
+      against max_input_vars (default 1000). File parts bypass the max_input_vars
+      counter but still pass through the same bracket parser, so the nesting
+      bound applies to them too. Amplification is therefore real but only
+      reachable when an operator raises the nesting limit.
+    citations:
+      - {file: main/php_variables.c, line: 133, token: "nest_level > PG(max_input_nesting_level)"}
+      - {file: main/php_variables.c, line: 465, token: "++count > PG(max_input_vars)"}
+      - {file: main/main.c, line: 608, token: "max_input_nesting_level"}
+      - {file: main/main.c, line: 609, token: "max_input_vars"}
+      - {file: main/rfc1867.c, line: 191, token: "safe_php_register_variable_ex"}
+    preconditions:
+      - "max_input_nesting_level raised above the depth of the payload"
+    expected_baseline: per-level array allocation, OOM only with a raised nesting limit
+    expected_lts2: unchanged for this vector; 001 does not add a nesting cap
+    attributed_patch: none
+
+  - id: S1
+    class: CVE-2026-109619
+    mechanism: fatal or OOM bailout abandons shutdown_executor teardown
+    applicability: inconclusive
+    confidence: medium
+    rationale: >-
+      The teardown that destroys EG(user_error_handlers) and the objects store
+      runs inside zend_try. A bailout raised inside that block skips the rest of
+      the teardown, and the baseline sets only EG(active)=0 afterwards, leaving
+      request-owned pointers behind. That is a producer. No 5.6 code path was
+      found that reads those pointers in a later request before reinitialising
+      them, so the consumer side, and with it a stale-state effect, is not
+      established.
+    citations:
+      - {file: Zend/zend_execute_API.c, line: 319, token: "zend_hash_destroy(&EG(included_files))"}
+      - {file: Zend/zend_execute_API.c, line: 322, token: "zend_ptr_stack_destroy(&EG(user_error_handlers))"}
+      - {file: Zend/zend_execute_API.c, line: 333, token: "EG(active) = 0"}
+      - {file: Zend/zend_alloc.c, line: 1804, token: "zend_bailout"}
+      - {file: sapi/apache2handler/sapi_apache2.c, line: 507, token: "php_request_shutdown(NULL)"}
+    preconditions:
+      - "single persistent worker so a later request reuses the same executor"
+      - "a bailout that lands while teardown is running"
+    expected_baseline: stale EG pointers remain after teardown is abandoned
+    expected_lts2: request-owned state is reset unconditionally after the teardown block
+    attributed_patch: CVE-2026-109618/001-avoid-state-corruption.patch
+
+  - id: S2
+    class: CVE-2026-109619
+    mechanism: nonfatal diagnostic repopulates error state after the reset
+    applicability: inconclusive
+    confidence: low
+    rationale: >-
+      The restore path in zend_API.c reuses a saved user_handler and destroys the
+      current one, which is the shape a stale-state consumer would need. However
+      no 5.6 call site was identified that runs this path after shutdown has
+      reset the executor and before the next request initialises it. Recorded as
+      absence of evidence, not as evidence of absence.
+    citations:
+      - {file: Zend/zend_API.c, line: 4026, token: "current->user_handler = EG(user_error_handler)"}
+      - {file: Zend/zend_API.c, line: 4037, token: "user_error_handler"}
+      - {file: Zend/zend_execute_API.c, line: 322, token: "user_error_handlers"}
+    preconditions:
+      - "a fatal handler or restore call that runs outside request scope"
+    expected_baseline: undefined; no reproducible sequence known
+    expected_lts2: reset removes the stored pointer, so any such consumer would read NULL
+    attributed_patch: CVE-2026-109618/001-avoid-state-corruption.patch
+
+  - id: S3
+    class: CVE-2026-109619
+    mechanism: session upload-progress record includes attacker-controlled names
+    applicability: applicable
+    confidence: high
+    rationale: >-
+      The progress key is assembled from the raw rfc1867 field value and stored
+      in the session, while field names are added to the record without the
+      delimiter check that the key path performs. A name containing the session
+      serialisation delimiter therefore desynchronises the record, which is the
+      precondition the 003 hardening addresses by encoding the delimiters. This
+      is a defensive-vector property, not the CVE mechanism itself.
+    citations:
+      - {file: ext/session/session.c, line: 990, token: "memchr(key, PS_DELIMITER"}
+      - {file: ext/session/session.c, line: 2711, token: "smart_str_appendl(&progress->key"}
+      - {file: ext/session/session.c, line: 2769, token: "field_name"}
+      - {file: ext/session/session.c, line: 977, token: "PS_DELIMITER"}
+    preconditions:
+      - "session.upload_progress.enabled=1"
+      - "a session the attacker can start, and a progress field name containing the delimiter"
+    expected_baseline: record desynchronisation observable in session data
+    expected_lts2: delimiters are percent-encoded in key, field_name and name
+    attributed_patch: CVE-2026-109619/003-harden-progress-record.patch
+
+  - id: B1
+    class: CVE-2026-109619
+    mechanism: zend_object_store var_destroy reentrancy use-after-free
+    applicability: not_applicable
+    confidence: medium
+    rationale: >-
+      The reconstructed 8.1 chain depends on the refcounted zend_string object
+      store introduced after 5.6. 5.6 uses a zval-based store with a different
+      destruction order, so the chain has no equivalent sink here. Kept in the
+      map so the negative result is recorded rather than silently dropped.
+    citations:
+      - {file: Zend/zend_objects_API.c, line: 274, token: "zend_object_store_get_object(const zval"}
+    preconditions:
+      - "PHP 8.1-style zend_string object store"
+    expected_baseline: chain cannot be expressed
+    expected_lts2: not applicable
+    attributed_patch: none
