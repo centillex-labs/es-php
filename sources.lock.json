@@ -12,7 +12,7 @@
     "5.4": {
       "version": "5.4.45",
       "version_id": 50445,
-      "es_revision": 3,
+      "es_revision": 4,
       "url": "https://museum.php.net/php5/php-5.4.45.tar.gz",
       "sha256": "25bc4723955f4e352935258002af14a14a9810b491a19400d76fcdfa9d04b28f",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.4.45",
@@ -44,13 +44,19 @@
           "upstream_origin": "448c9be157f4147e121f1a2a524536c75c9c6059",
           "kind": "upstream-backport",
           "sha256": "12da1bc20fe8341853f42d1b440ded6b2a813da12fb68ffdd3e1dbe15b719079"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2020-7066/001-get-headers-reject-nul.patch",
+          "upstream_origin": "0d139c5b94a5f485a66901919e51faddb0371c43",
+          "kind": "upstream-backport",
+          "sha256": "624670ba1798fb183f895288e379584ae8b0b1e45542df0109ebfd63880f75e6"
         }
       ]
     },
     "5.5": {
       "version": "5.5.38",
       "version_id": 50538,
-      "es_revision": 3,
+      "es_revision": 4,
       "url": "https://museum.php.net/php5/php-5.5.38.tar.gz",
       "sha256": "4f458c9b504269615715a62f182b7c2f89bb8284f484befc221b56a1571b506e",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.5.38",
@@ -82,13 +88,19 @@
           "upstream_origin": "448c9be157f4147e121f1a2a524536c75c9c6059",
           "kind": "upstream-backport",
           "sha256": "12da1bc20fe8341853f42d1b440ded6b2a813da12fb68ffdd3e1dbe15b719079"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2020-7066/001-get-headers-reject-nul.patch",
+          "upstream_origin": "0d139c5b94a5f485a66901919e51faddb0371c43",
+          "kind": "upstream-backport",
+          "sha256": "66f385a3627f7a479105b088502ab5772b6c13b0f9f3642213672e8855570b59"
         }
       ]
     },
     "5.6": {
       "version": "5.6.40",
       "version_id": 50640,
-      "es_revision": 2,
+      "es_revision": 3,
       "url": "https://museum.php.net/php5/php-5.6.40.tar.gz",
       "sha256": "56fb9878d12fdd921f6a0897e919f4e980d930160e154cbde2cc6d9206a27cac",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.6.40",
@@ -114,6 +126,12 @@
           "upstream_origin": "ab061f95ca966731b1c84cf5b7b20155c0a1c06a",
           "kind": "upstream-backport-candidate",
           "sha256": "bb8949f3caf84ca1e0840a94457c4c36f137a151ac5c51013b02ce2eec3e4918"
+        },
+        {
+          "path": "php-5.6-patches/CVE-2020-7066/001-get-headers-reject-nul.patch",
+          "upstream_origin": "0d139c5b94a5f485a66901919e51faddb0371c43",
+          "kind": "upstream-backport",
+          "sha256": "f67e2cf4e443e8517f4200069fc4a323201588ad41b59f056f307318ecae10b7"
         }
       ]
     },

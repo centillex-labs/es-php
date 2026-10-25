@@ -6,3 +6,4 @@ CVE-2026-109619/002-restore-upload-progress.patch
 CVE-2026-109619/003-harden-progress-record.patch
 CVE-2019-11043/001-bound-path-info.patch
 CVE-2016-7124/001-destroy-broken-object.patch
+CVE-2020-7066/001-get-headers-reject-nul.patch

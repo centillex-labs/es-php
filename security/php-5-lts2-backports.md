@@ -20,7 +20,7 @@ Do not infer immunity from an unsupported branch being absent from a CVE record.
 | CVE-2020-7060 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Retrieve vendor/upstream fix and test |
 | CVE-2020-7063 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Retrieve vendor/upstream fix and test |
 | CVE-2020-7064 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Retrieve vendor/upstream fix and test |
-| CVE-2020-7066 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Retrieve vendor/upstream fix and test |
+| CVE-2020-7066 | Fixed + tested | Fixed + tested | Fixed + tested | Baseline connects and truncates; patched refuses |
 | CVE-2020-7067 | Configuration review | Configuration review | Configuration review | Establish EBCDIC applicability; do not claim generic exposure |
 
 CVE-2016-7479 is not automatically an additional PHP 5 vulnerability: Debian
