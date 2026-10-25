@@ -30,7 +30,17 @@ Source tarballs are published for every branch as **LTS releases**:
 
 ```
 php-8.1.34-lts1.tar.gz        # top-level dir: php-8.1.34-lts1/
+php-5.6.40-lts2.tar.gz        # top-level dir: php-5.6.40-lts2/
 ```
+
+| Release | Branches | Notes |
+| --- | --- | --- |
+| [LTS 1](https://github.com/centillex-labs/es-php/releases/tag/lts1) | all nine | first collective release |
+| [LTS 2](https://github.com/centillex-labs/es-php/releases/tag/lts2) | 5.4, 5.5, 5.6 | EOL-era CVEs: 2019-11043, 2016-7124, 2020-7066, 2020-7060, plus 2020-7064, 2019-11046 and 2018-14883 shipped unproven |
+
+The PHP 7.x and 8.1 branches stay on LTS 1; their sources have not changed.
+The per-branch audit ledger is
+[security/php-5-lts2-backports.md](security/php-5-lts2-backports.md).
 
 - Version scheme is `<upstream-version>-lts<N>` (e.g. `8.1.34-lts1`);
   `PHP_VERSION_ID` is left at the upstream value so integer checks are
