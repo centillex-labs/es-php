@@ -1,0 +1,22 @@
+# UNPATCHED upstream PHP 5.x with exif/bcmath/mbstring: LTS 2 control image.
+# Deliberately vulnerable; local differential testing only.
+# UNPATCHED upstream PHP 5.4.45 — A/B baseline for the blog lab only.
+# Deliberately vulnerable: no CVE-2026-109618/109619 patches applied.
+# Never use this image for anything except local differential testing.
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential autoconf bison re2c pkg-config ca-certificates gzip patch \
+    && rm -rf /var/lib/apt/lists/*
+ARG VERSION
+ARG SHA256
+WORKDIR /usr/src/php
+COPY downloads/php-${VERSION}.tar.gz /tmp/php.tar.gz
+RUN echo "${SHA256}  /tmp/php.tar.gz" | sha256sum -c - \
+    && tar -xzf /tmp/php.tar.gz --strip-components=1 && rm /tmp/php.tar.gz
+ARG JOBS=3
+RUN CFLAGS='-O2 -g -fcommon' ./configure --disable-all --enable-cli --enable-fpm \
+      --enable-session --enable-json \
+      --enable-hash --enable-ctype --enable-tokenizer --enable-filter \
+      --enable-exif --enable-bcmath --enable-mbstring \
+    && make -j"$JOBS"
+CMD ["sapi/cli/php", "-v"]

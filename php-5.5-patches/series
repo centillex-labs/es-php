@@ -7,3 +7,7 @@ CVE-2026-109619/003-harden-progress-record.patch
 CVE-2019-11043/001-bound-path-info.patch
 CVE-2016-7124/001-destroy-broken-object.patch
 CVE-2020-7066/001-get-headers-reject-nul.patch
+CVE-2018-14883/001-exif-thumbnail-bounds.patch
+CVE-2020-7064/001-exif-short-tiff-and-section-size.patch
+CVE-2019-11046/001-bcmath-ascii-digits-only.patch
+CVE-2020-7060/001-mbstring-cp950-trail-range.patch

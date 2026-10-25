@@ -12,7 +12,7 @@
     "5.4": {
       "version": "5.4.45",
       "version_id": 50445,
-      "es_revision": 4,
+      "es_revision": 2,
       "url": "https://museum.php.net/php5/php-5.4.45.tar.gz",
       "sha256": "25bc4723955f4e352935258002af14a14a9810b491a19400d76fcdfa9d04b28f",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.4.45",
@@ -50,13 +50,37 @@
           "upstream_origin": "0d139c5b94a5f485a66901919e51faddb0371c43",
           "kind": "upstream-backport",
           "sha256": "624670ba1798fb183f895288e379584ae8b0b1e45542df0109ebfd63880f75e6"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2019-11046/001-bcmath-ascii-digits-only.patch",
+          "upstream_origin": "eb23c6008753b1cdc5359dead3a096dce46c9018",
+          "kind": "upstream-backport",
+          "sha256": "c87618a57279eb17ac0e9c241abb07fff02429e30a7c6629cf3172eac008f3d1"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2020-7064/001-exif-short-tiff-and-section-size.patch",
+          "upstream_origin": "25238bdf6005b85ab844aa2b743b589dfce9f0d2",
+          "kind": "upstream-backport",
+          "sha256": "62820030704e5a735469982d03de4deef4fd856a954d2e03b0b1929095783e81"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2020-7060/001-mbstring-cp950-trail-range.patch",
+          "upstream_origin": "2bcbc95f033c31b00595ed39f79c3a99b4ed0501",
+          "kind": "upstream-backport",
+          "sha256": "edb58e2af91337d83768962cf8700bb36850b921ccf96c6ac1bae0f1d0125627"
+        },
+        {
+          "path": "php-5.4-patches/CVE-2018-14883/001-exif-thumbnail-bounds.patch",
+          "upstream_origin": "1baeae42703f9b2ec21fff787146eeca08d45535",
+          "kind": "upstream-backport",
+          "sha256": "b760691f240b5baa649d20b8a02306a42d18e44ed14ba279a62ba446dc547db1"
         }
       ]
     },
     "5.5": {
       "version": "5.5.38",
       "version_id": 50538,
-      "es_revision": 4,
+      "es_revision": 2,
       "url": "https://museum.php.net/php5/php-5.5.38.tar.gz",
       "sha256": "4f458c9b504269615715a62f182b7c2f89bb8284f484befc221b56a1571b506e",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.5.38",
@@ -94,13 +118,37 @@
           "upstream_origin": "0d139c5b94a5f485a66901919e51faddb0371c43",
           "kind": "upstream-backport",
           "sha256": "66f385a3627f7a479105b088502ab5772b6c13b0f9f3642213672e8855570b59"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2019-11046/001-bcmath-ascii-digits-only.patch",
+          "upstream_origin": "eb23c6008753b1cdc5359dead3a096dce46c9018",
+          "kind": "upstream-backport",
+          "sha256": "c87618a57279eb17ac0e9c241abb07fff02429e30a7c6629cf3172eac008f3d1"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2020-7064/001-exif-short-tiff-and-section-size.patch",
+          "upstream_origin": "25238bdf6005b85ab844aa2b743b589dfce9f0d2",
+          "kind": "upstream-backport",
+          "sha256": "ec4a960798dd8bf53e18f2be872fe8640fa2150c7366bcef972261e737727a1f"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2020-7060/001-mbstring-cp950-trail-range.patch",
+          "upstream_origin": "2bcbc95f033c31b00595ed39f79c3a99b4ed0501",
+          "kind": "upstream-backport",
+          "sha256": "edb58e2af91337d83768962cf8700bb36850b921ccf96c6ac1bae0f1d0125627"
+        },
+        {
+          "path": "php-5.5-patches/CVE-2018-14883/001-exif-thumbnail-bounds.patch",
+          "upstream_origin": "1baeae42703f9b2ec21fff787146eeca08d45535",
+          "kind": "upstream-backport",
+          "sha256": "b760691f240b5baa649d20b8a02306a42d18e44ed14ba279a62ba446dc547db1"
         }
       ]
     },
     "5.6": {
       "version": "5.6.40",
       "version_id": 50640,
-      "es_revision": 3,
+      "es_revision": 2,
       "url": "https://museum.php.net/php5/php-5.6.40.tar.gz",
       "sha256": "56fb9878d12fdd921f6a0897e919f4e980d930160e154cbde2cc6d9206a27cac",
       "checksum_source": "https://www.php.net/releases/index.php?json&version=5.6.40",
@@ -132,6 +180,24 @@
           "upstream_origin": "0d139c5b94a5f485a66901919e51faddb0371c43",
           "kind": "upstream-backport",
           "sha256": "f67e2cf4e443e8517f4200069fc4a323201588ad41b59f056f307318ecae10b7"
+        },
+        {
+          "path": "php-5.6-patches/CVE-2019-11046/001-bcmath-ascii-digits-only.patch",
+          "upstream_origin": "eb23c6008753b1cdc5359dead3a096dce46c9018",
+          "kind": "upstream-backport",
+          "sha256": "c87618a57279eb17ac0e9c241abb07fff02429e30a7c6629cf3172eac008f3d1"
+        },
+        {
+          "path": "php-5.6-patches/CVE-2020-7064/001-exif-short-tiff-and-section-size.patch",
+          "upstream_origin": "25238bdf6005b85ab844aa2b743b589dfce9f0d2",
+          "kind": "upstream-backport",
+          "sha256": "d9de0f2d01234713bd501b6e95facfd263496e11ae41afd783c101a768d1dc84"
+        },
+        {
+          "path": "php-5.6-patches/CVE-2020-7060/001-mbstring-cp950-trail-range.patch",
+          "upstream_origin": "2bcbc95f033c31b00595ed39f79c3a99b4ed0501",
+          "kind": "upstream-backport",
+          "sha256": "edb58e2af91337d83768962cf8700bb36850b921ccf96c6ac1bae0f1d0125627"
         }
       ]
     },

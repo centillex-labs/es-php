@@ -14,14 +14,14 @@ Do not infer immunity from an unsupported branch being absent from a CVE record.
 | CVE | 5.4 | 5.5 | 5.6 | Next gate |
 | --- | --- | --- | --- | --- |
 | CVE-2016-7124 | Fixed + tested | Fixed + tested | Already fixed upstream (verified) | Baseline control confirms 5.4/5.5 were vulnerable |
-| CVE-2018-14883 | Applicability review | Applicability review | Upstream fix reported in 5.6.37; verify locally | Compare EXIF implementation and upstream fix |
+| CVE-2018-14883 | Patched, unproven | Patched, unproven | Fixed upstream | 32-bit-only overflow; an amd64 baseline cannot fail |
 | CVE-2019-11043 | Fixed + tested | Fixed + tested | Fixed + tested | Enabled in series; Docker FPM differential passes |
-| CVE-2019-11046 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Inspect BCMath fix and configuration conditions |
-| CVE-2020-7060 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Retrieve vendor/upstream fix and test |
-| CVE-2020-7063 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Retrieve vendor/upstream fix and test |
-| CVE-2020-7064 | Applicability review | Applicability review | Vendor-confirmed applicability; port pending | Retrieve vendor/upstream fix and test |
+| CVE-2019-11046 | Patched, unproven | Patched, unproven | Patched, unproven | Needs a libc where isdigit() accepts bytes >= 0x80 |
+| CVE-2020-7060 | Proven (UBSan + behaviour) | Proven (behaviour) | Proven (behaviour) | Out-of-bounds cp950_pua_tbl row is gone |
+| CVE-2020-7063 | Not ported | Not ported | Not ported | PharData permission bits; 5.4/5.5 phar code differs from 5.6 |
+| CVE-2020-7064 | Patched, unproven | Patched, unproven | Patched, unproven | MSan-only trigger; no Memcheck or UBSan baseline |
 | CVE-2020-7066 | Fixed + tested | Fixed + tested | Fixed + tested | Baseline connects and truncates; patched refuses |
-| CVE-2020-7067 | Configuration review | Configuration review | Configuration review | Establish EBCDIC applicability; do not claim generic exposure |
+| CVE-2020-7067 | Not applicable | Not applicable | Not applicable | EBCDIC-only; these builds are ASCII |
 
 CVE-2016-7479 is not automatically an additional PHP 5 vulnerability: Debian
 notes that the property-table flaw affects PHP 7, while related defensive changes
@@ -79,3 +79,27 @@ and require non-NULL `path_info` before setting `tflag`.
 - https://security-tracker.debian.org/tracker/CVE-2020-7064
 - https://security-tracker.debian.org/tracker/CVE-2020-7066
 - https://security-tracker.debian.org/tracker/CVE-2020-7067
+
+## LTS 2 outcome
+
+Ships with a baseline that fails on this platform:
+
+| CVE | 5.4 | 5.5 | 5.6 | Evidence |
+| --- | --- | --- | --- | --- |
+| CVE-2019-11043 | proven | proven | proven | FastCGI differential, `tests/fpm-path-info/` |
+| CVE-2016-7124 | proven | proven | fixed upstream | object type after a failed unserialize |
+| CVE-2020-7066 | proven | proven | proven | socket request line is no longer truncated |
+| CVE-2020-7060 | proven (UBSan) | proven (behaviour) | proven (behaviour) | `tests/php5-memory-cves/` |
+
+Shipped as hardening but **not proven on `linux/amd64`**, because no baseline can
+fail here:
+
+- CVE-2019-11046 — needs a libc whose `isdigit()` accepts bytes >= 0x80.
+- CVE-2020-7064 — the trigger is a MemorySanitizer-only uninitialized read.
+- CVE-2018-14883 — needs a 32-bit `size_t` for the offset sum to wrap.
+
+Not shipped, still open:
+
+- CVE-2020-7063 (PharData permission bits) — the 5.4/5.5 phar code differs from
+  5.6 and no semantic port was attempted.
+- CVE-2020-7067 — EBCDIC-only, not applicable to these ASCII builds.
