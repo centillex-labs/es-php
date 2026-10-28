@@ -1,7 +1,7 @@
 # EOL PHP patch maintenance
 
 Maintained source stacks: PHP **5.4.45, 5.5.38, 5.6.40, 7.0.33, 7.1.33,
-7.2.34, 7.3.33, 7.4.33, and 8.1.34**.
+7.2.34, 7.3.33, 7.4.33, 8.0.30, and 8.1.34**.
 
 ## Compatibility policy
 
@@ -35,10 +35,14 @@ php-5.6.40-lts2.tar.gz        # top-level dir: php-5.6.40-lts2/
 
 | Release | Branches | Notes |
 | --- | --- | --- |
-| [LTS 1](https://github.com/centillex-labs/es-php/releases/tag/lts1) | all nine | first collective release |
+| [LTS 1](https://github.com/centillex-labs/es-php/releases/tag/lts1) | the original nine | first collective release |
 | [LTS 2](https://github.com/centillex-labs/es-php/releases/tag/lts2) | 5.4, 5.5, 5.6 | EOL-era CVEs: 2019-11043, 2016-7124, 2020-7066, 2020-7060, plus 2020-7064, 2019-11046 and 2018-14883 shipped unproven |
+| [LTS 3](https://github.com/centillex-labs/es-php/releases/tag/lts3) | 8.0 (first appearance) | `8.0.30-lts3` with a ported 618/619 series |
 
-The PHP 7.x and 8.1 branches stay on LTS 1; their sources have not changed.
+Unchanged branches keep their earlier revision: the PHP 7.x and 8.1 branches stay
+on LTS 1. A branch that first appears in collective release *N* uses
+`es_revision = N`, so its artifact reads `<version>-ltsN` even when nothing else
+changed.
 The per-branch audit ledger is
 [security/php-5-lts2-backports.md](security/php-5-lts2-backports.md).
 
