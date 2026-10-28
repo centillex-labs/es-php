@@ -44,3 +44,8 @@
 !php-7.1-patches/**
 !php-7.0-patches/
 !php-7.0-patches/**
+!containers/php-8.0/
+!containers/php-8.0/Dockerfile
+!downloads/php-8.0.30.tar.xz
+!php-8.0-patches/
+!php-8.0-patches/**

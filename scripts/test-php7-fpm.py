@@ -13,7 +13,7 @@ import tempfile
 import time
 
 p = argparse.ArgumentParser()
-p.add_argument('branch', choices=['5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.1'])
+p.add_argument('branch', choices=['5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1'])
 a = p.parse_args()
 image = 'es-php:' + a.branch + '-test'
 root = Path(__file__).resolve().parent.parent

@@ -1,0 +1,6 @@
+# PHP 8.0 port of the CVE-2026-109618/109619 mitigation.
+CVE-2026-109618/001-avoid-state-corruption.patch
+# 002: compatibility override preserving upload progress (not a security fix).
+# 003: harden the whole progress record (encode < and | in key, field_name and name).
+CVE-2026-109619/002-restore-upload-progress.patch
+CVE-2026-109619/003-harden-progress-record.patch

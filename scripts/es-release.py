@@ -53,6 +53,7 @@ CONFIGURE_FLAGS: dict[str, list[str]] = {
     "7.3": ["--disable-all", "--enable-cli", "--enable-fpm", "--enable-session", "--enable-json", "--enable-opcache"],
     "7.4": ["--disable-all", "--enable-cli", "--enable-fpm", "--enable-session", "--enable-json", "--enable-opcache"],
     "8.1": ["--disable-all", "--enable-cli", "--enable-fpm", "--enable-session", "--enable-opcache", "--enable-zend-test"],
+    "8.0": ["--disable-all", "--enable-cli", "--enable-fpm", "--enable-session", "--enable-opcache", "--enable-zend-test"],
 }
 
 

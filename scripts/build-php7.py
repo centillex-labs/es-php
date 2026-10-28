@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 
 parser = argparse.ArgumentParser()
-parser.add_argument('branch', choices=['5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.1'])
+parser.add_argument('branch', choices=['5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1'])
 parser.add_argument('--debug', action='store_true')
 parser.add_argument('--jobs', type=int, default=4)
 args = parser.parse_args()
